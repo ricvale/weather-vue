@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Weather Cities App</title>
+    <style>
+        body {
+            background: linear-gradient(30deg, red, orange, yellow, green, blue, indigo, violet);
+            color:white;
+            font-family: Verdana, Geneva, Tahoma, sans-serif, Times, 'Times New Roman', serif;
+            min-height: 100vh;
+        }
+        
+        #app  {
+            max-width:  360px;
+            margin:auto;
+        }
+        .info {
+            display: grid;
+            justify-items: center;
+            grid-row-gap: 0;
+        }
+        .rounded{
+            padding:10px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background-color: rgba(0,0,0,0.3);
+        }
+        input[type=text], .btn {
+            padding: 10px 5px;   
+            width:100%;;
+        }       
+        .form {
+            display: inline-grid;
+            grid-template-columns: 5fr 5fr 2fr;
+            
+            grid-column-gap: 15px;
+            max-width: 100%;
+        }
+        .comments{
+            display: inline-grid;
+            justify-items: center;
+        }
+
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+    <div id="app" class="rounded">
+
+            <form @submit="fetchWeather" class="form" action="#" method="GET">
+                <div>
+                    <input v-model="location" placeholder="London, UK" type="text" value="{location}" />
+                </div>
+                
+                <div>
+                    <input :disabled='isDisabled' type="submit" class="btn" value="Get city time & weather">
+                </div>
+
+                <div>
+                    <input type="radio" id="imperial" value="imperial" v-model="units" v-on:change="fetchWeather" checked>
+                    <label for="imperial">℉</label>
+                    <br>
+                    <input type="radio" id="metric" value="metric" v-model="units" v-on:change="fetchWeather">
+                    <label for="metric">℃</label>
+                </div>
+            </form>
+
+            <div class="info" v-if="info !== null"><!-- class="bg" :style="{ backgroundImage: `url(${icon_url})` }"> -->
+
+                <div><h1  style="margin:20px 0 0 0;">{{ info.data.name }}, {{ info.data.sys.country }}</h1></div>                
+                
+                <div><p >&#128337; <em>{{ local_date.toLocaleString('en-us',  { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) }}</em></p></div>
+                
+                <div class="rounded" style="font-size: 66px;font-weight: 900;">{{ info.data.main.temp }}{{ setUnits }}</div>
+                
+                <div style="font-size: 48px;font-style: italic;">{{ info.data.weather[0].main }}</div>
+
+                <div style="font-size: 18px;">{{ info.data.main.temp_min }}{{ setUnits }} / {{ info.data.main.temp_max }}{{ setUnits }}</div>
+
+                <div><img alt="Conditions icon" :src="icon_url"></div>
+
+                <div  class="rounded comments">
+                   <div><strong>{{ info.data.weather[0].description }}</strong></div> 
+                   <div><em>Feels like {{ info.data.main.feels_like }}{{ setUnits }}, {{ info.data.main.humidity }}% humidity</em></div> 
+                </div>
+
+            </div>
+            
+            <div style="color:red;font-size: 28px;padding:10px 0;margin:auto;">{{ error }}</div>
+
+        <br>
+
+        <!-- {{ info }}-->
+    
+    </div>
+
+    <script>
+    var app = new Vue({
+        el: '#app',
+        data () {
+            return {
+                info: null,
+                error: null,
+                units: 'imperial',
+                icon_url: null,
+                location: '',
+                api_url: 'https://api.openweathermap.org/data/2.5/weather?appid=fc437bd98705f59808002b7a9f2a3537&lang=en',
+                my_time_offset: (new Date()).getTimezoneOffset() * 60,
+                local_date: 'Loading...',
+                local_offset: 0,
+            }
+        },
+
+        methods: {
+            fetchWeather () {
+                this.error = null;
+
+               axios
+                    .get(this.api_url + '&units=' + this.units + '&q=' + this.location)
+                    .then(
+                        response => 
+                        (
+                            this.info = response, 
+                            this.icon_url = 'http://openweathermap.org/img/wn/' 
+                                        + response.data.weather[0].icon
+                                        + '@4x.png',
+                            this.local_offset = (response.data.timezone),
+                            this.adjustForTimezone()
+                        ),
+                    )
+                    .catch( (error) => {
+                        if ( error.response.status === 404 | 400) {
+                            this.error = "Not Found!"    ;
+                            this.info = null;
+                        }
+                    } )
+                },
+            
+                adjustForTimezone(){
+                   this.local_date = new Date( new Date().getTime() + (this.local_offset + this.my_time_offset) * 1000 );
+                }
+
+        },
+        computed: {
+            isDisabled() {
+                // check form is filled or not here.
+                return (this.location === '')
+            },
+            setUnits() {
+                return (this.units == 'imperial' ? '℉' : '℃')
+            }
+        },
+
+        mounted () {
+            // On page load:
+            this.location= "San Francisco, US";
+            this.fetchWeather ();
+        },
+
+    })
+
+    </script>
+</body>
+</html>
