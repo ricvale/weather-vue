@@ -52,9 +52,9 @@
 <body>
     <div id="app" class="rounded">
 
-            <form @submit="fetchWeather" class="form" action="#" method="GET">
+            <form @submit.prevent="fetchWeather" class="form" action="#" method="GET">
                 <div>
-                    <input v-model="location" placeholder="London, UK" type="text" value="{location}" />
+                    <input v-model="location" placeholder="Miami, US" type="text" value="{location}" />
                 </div>
                 
                 <div>
