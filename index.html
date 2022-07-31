@@ -76,17 +76,17 @@
                 
                 <div><p >&#128337; <em>{{ local_date.toLocaleString('en-us',  { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) }}</em></p></div>
                 
-                <div class="rounded" style="font-size: 66px;font-weight: 900;">{{ info.data.main.temp }}{{ setUnits }}</div>
+                <div class="rounded" style="font-size: 66px;font-weight: 900;">{{ info.data.main.temp.toFixed(0) }}{{ setUnits }}</div>
                 
                 <div style="font-size: 48px;font-style: italic;">{{ info.data.weather[0].main }}</div>
 
-                <div style="font-size: 18px;">{{ info.data.main.temp_min }}{{ setUnits }} / {{ info.data.main.temp_max }}{{ setUnits }}</div>
+                <div style="font-size: 18px;">min {{ info.data.main.temp_min.toFixed(1) }}{{ setUnits }} / max {{ info.data.main.temp_max.toFixed(1) }}{{ setUnits }}</div>
 
                 <div><img alt="Conditions icon" :src="icon_url"></div>
 
                 <div  class="rounded comments">
                    <div><strong>{{ info.data.weather[0].description }}</strong></div> 
-                   <div><em>Feels like {{ info.data.main.feels_like }}{{ setUnits }}, {{ info.data.main.humidity }}% humidity</em></div> 
+                   <div><em>Feels like {{ info.data.main.feels_like.toFixed(1) }}{{ setUnits }}, {{ info.data.main.humidity }}% humidity</em></div> 
                 </div>
 
             </div>
